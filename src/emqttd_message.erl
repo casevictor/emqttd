@@ -57,7 +57,7 @@ make(From, Qos, Topic, Payload) ->
 from_packet(#mqtt_packet{header   = #mqtt_packet_header{type   = ?PUBLISH,
                                                         retain = Retain,
                                                         qos    = Qos,
-                                                        dup    = Dup}, 
+                                                        dup    = Dup},
                          variable = #mqtt_packet_publish{topic_name = Topic,
                                                          packet_id  = PacketId},
                          payload  = Payload}) ->
@@ -86,7 +86,7 @@ from_packet(#mqtt_packet_connect{client_id   = ClientId,
                   retain    = Retain,
                   qos       = Qos,
                   dup       = false,
-                  payload   = Msg, 
+                  payload   = Msg,
                   timestamp = os:timestamp()}.
 
 from_packet(ClientId, Packet) ->
@@ -109,19 +109,20 @@ to_packet(#mqtt_message{pktid   = PkgId,
                         retain  = Retain,
                         dup     = Dup,
                         topic   = Topic,
-                        payload = Payload}) ->
+                        payload = Payload,
+                        timestamp = TimeStamp}) ->
 
     #mqtt_packet{header = #mqtt_packet_header{type   = ?PUBLISH,
                                               qos    = Qos,
                                               retain = Retain,
                                               dup    = Dup},
                  variable = #mqtt_packet_publish{topic_name = Topic,
-                                                 packet_id  = if 
+                                                 packet_id  = if
                                                                   Qos =:= ?QOS_0 -> undefined;
                                                                   true -> PkgId
-                                                              end  
+                                                              end
                                                 },
-                 payload = Payload}.
+                 payload = list_to_binary([integer_to_binary(emqttd_time:now_to_secs(TimeStamp)),Payload])}.
 
 %% @doc set dup, retain flag
 -spec(set_flag(mqtt_message()) -> mqtt_message()).
@@ -129,9 +130,9 @@ set_flag(Msg) ->
     Msg#mqtt_message{dup = true, retain = true}.
 
 -spec(set_flag(atom(), mqtt_message()) -> mqtt_message()).
-set_flag(dup, Msg = #mqtt_message{dup = false}) -> 
+set_flag(dup, Msg = #mqtt_message{dup = false}) ->
     Msg#mqtt_message{dup = true};
-set_flag(sys, Msg = #mqtt_message{sys = false}) -> 
+set_flag(sys, Msg = #mqtt_message{sys = false}) ->
     Msg#mqtt_message{sys = true};
 set_flag(retain, Msg = #mqtt_message{retain = false}) ->
     Msg#mqtt_message{retain = true};
@@ -143,7 +144,7 @@ unset_flag(Msg) ->
     Msg#mqtt_message{dup = false, retain = false}.
 
 -spec(unset_flag(dup | retain | atom(), mqtt_message()) -> mqtt_message()).
-unset_flag(dup, Msg = #mqtt_message{dup = true}) -> 
+unset_flag(dup, Msg = #mqtt_message{dup = true}) ->
     Msg#mqtt_message{dup = false};
 unset_flag(retain, Msg = #mqtt_message{retain = true}) ->
     Msg#mqtt_message{retain = false};
@@ -158,4 +159,3 @@ format(#mqtt_message{msgid = MsgId, pktid = PktId, from = From, sender = Sender,
 i(true)  -> 1;
 i(false) -> 0;
 i(I) when is_integer(I) -> I.
-

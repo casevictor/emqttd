@@ -148,4 +148,3 @@ opt(false)                -> 0;
 opt(true)                 -> 1;
 opt(X) when is_integer(X) -> X;
 opt(B) when is_binary(B)  -> 1.
-
