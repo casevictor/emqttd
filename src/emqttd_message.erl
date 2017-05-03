@@ -122,7 +122,7 @@ to_packet(#mqtt_message{pktid   = PkgId,
                                                                   true -> PkgId
                                                               end
                                                 },
-                 payload = list_to_binary([integer_to_binary(emqttd_time:now_to_secs(TimeStamp)),Payload])}.
+                 payload = list_to_binary([integer_to_binary(TimeStamp),Payload])}.
 
 %% @doc set dup, retain flag
 -spec(set_flag(mqtt_message()) -> mqtt_message()).
