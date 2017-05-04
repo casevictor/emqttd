@@ -37,7 +37,7 @@ make(From, Topic, Payload) ->
     #mqtt_message{topic     = Topic,
                   from      = From,
                   payload   = Payload,
-                  timestamp = os:timestamp()}.
+                  timestamp = erlang:system_time(milli_seconds)}.
 
 -spec(make(From, Qos, Topic, Payload) -> mqtt_message() when
       From    :: atom() | binary(),
@@ -50,7 +50,7 @@ make(From, Qos, Topic, Payload) ->
                   from      = From,
                   qos       = ?QOS_I(Qos),
                   payload   = Payload,
-                  timestamp = os:timestamp()}.
+                  timestamp = erlang:system_time(milli_seconds)}.
 
 %% @doc Message from Packet
 -spec(from_packet(mqtt_packet()) -> mqtt_message()).
@@ -68,7 +68,7 @@ from_packet(#mqtt_packet{header   = #mqtt_packet_header{type   = ?PUBLISH,
                   dup      = Dup,
                   topic    = Topic,
                   payload  = Payload,
-                  timestamp = os:timestamp()};
+                  timestamp = erlang:system_time(milli_seconds)};
 
 from_packet(#mqtt_packet_connect{will_flag  = false}) ->
     undefined;
@@ -87,7 +87,7 @@ from_packet(#mqtt_packet_connect{client_id   = ClientId,
                   qos       = Qos,
                   dup       = false,
                   payload   = Msg,
-                  timestamp = os:timestamp()}.
+                  timestamp = erlang:system_time(milli_seconds)}.
 
 from_packet(ClientId, Packet) ->
     Msg = from_packet(Packet),
